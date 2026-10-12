@@ -29,6 +29,7 @@ variables.
 - `SALT_ROTATION=month`
 - `DEFAULT_LOCALE=sv-SE`
 - `DEFAULT_CURRENCY=SEK`
+- `PNPM_VERSION=12.3.4`
 
 ## Updating Umami
 
