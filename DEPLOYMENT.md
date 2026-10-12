@@ -19,6 +19,10 @@ The database password is stored in the local macOS Keychain under service
 the database URLs and application secret as secret production environment
 variables.
 
+The Umami administrator password is stored in the local macOS Keychain under
+service `umami-admin-stln-umami-analytics` and account `admin`. The upstream
+default password has been replaced and no longer authenticates.
+
 ## Required Netlify environment variables
 
 - `DATABASE_URL`
