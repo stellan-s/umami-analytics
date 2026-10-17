@@ -31,6 +31,7 @@ default password has been replaced and no longer authenticates.
 - `DISABLE_TELEMETRY=1`
 - `PRIVATE_MODE=1`
 - `SALT_ROTATION=month`
+- `GEO_LOCATION_LEVEL=country`
 - `DEFAULT_LOCALE=sv-SE`
 - `DEFAULT_CURRENCY=SEK`
 - `PNPM_VERSION=12.3.4`
@@ -52,3 +53,8 @@ Prisma migrations against the isolated `umami` schema before deploying.
 When adding each application, exclude URL search parameters and fragments,
 restrict the tracker to the application's production domains, and keep replay
 and heatmaps disabled until they have been reviewed separately.
+
+`GEO_LOCATION_LEVEL=country` is a privacy patch carried by this fork. It keeps
+country-level reporting while preventing region and city values from being
+written. Upstream behavior remains available with `full`; `none` disables all
+location fields.

@@ -12,7 +12,13 @@ import { parseRequest } from '@/lib/request';
 import { badRequest, forbidden, json, serverError } from '@/lib/response';
 import { anyObjectParam, urlOrPathParam } from '@/lib/schema';
 import { safeDecodeURI, safeDecodeURIComponent } from '@/lib/url';
-import { createSession, saveEvent, saveSessionData, saveSessionLink, updateSession } from '@/queries/sql';
+import {
+  createSession,
+  saveEvent,
+  saveSessionData,
+  saveSessionLink,
+  updateSession,
+} from '@/queries/sql';
 
 interface Cache {
   websiteId: string;
@@ -134,10 +140,12 @@ export async function POST(request: Request) {
     let sessionLinkId = cache?.sessionLinkId;
 
     // Client info
-    const { ip, userAgent, device, browser, os, country, region, city } = await getClientInfo(
-      request,
-      payload,
-    );
+    const clientInfo = await getClientInfo(request, payload);
+    const { ip, userAgent, device, browser, os } = clientInfo;
+    const geoLocationLevel = process.env.GEO_LOCATION_LEVEL || 'full';
+    const country = geoLocationLevel === 'none' ? undefined : clientInfo.country;
+    const region = geoLocationLevel === 'full' ? clientInfo.region : undefined;
+    const city = geoLocationLevel === 'full' ? clientInfo.city : undefined;
 
     // Bot check
     if (!process.env.DISABLE_BOT_CHECK && isbot(userAgent)) {

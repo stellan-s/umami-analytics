@@ -101,13 +101,20 @@ function makeComputedSessionId(
   const createdAt = new Date(timestamp * 1000);
   const sessionSalt = getSalt(process.env.SALT_ROTATION || 'month', createdAt);
 
-  return uuid(sourceId, defaultClientInfo.ip, defaultClientInfo.userAgent, sessionSalt, distinctId ?? '');
+  return uuid(
+    sourceId,
+    defaultClientInfo.ip,
+    defaultClientInfo.userAgent,
+    sessionSalt,
+    distinctId ?? '',
+  );
 }
 
 beforeEach(() => {
   vi.clearAllMocks();
   (clickhouse as any).enabled = false;
   delete process.env.DISABLE_BOT_CHECK;
+  delete process.env.GEO_LOCATION_LEVEL;
   delete process.env.REMOVE_TRAILING_SLASH;
   delete process.env.SALT_ROTATION;
 
@@ -320,6 +327,23 @@ describe('session creation', () => {
     await callPOST({ type: 'event', payload: { website: WEBSITE_ID, url: '/' } });
 
     expect(createSessionMock).not.toHaveBeenCalled();
+  });
+
+  test('keeps only country-level location when configured', async () => {
+    process.env.GEO_LOCATION_LEVEL = 'country';
+
+    await callPOST({ type: 'event', payload: { website: WEBSITE_ID, url: '/' } });
+
+    expect(createSessionMock.mock.calls[0][0]).toMatchObject({
+      country: 'US',
+      region: undefined,
+      city: undefined,
+    });
+    expect(saveEventMock.mock.calls[0][0]).toMatchObject({
+      country: 'US',
+      region: undefined,
+      city: undefined,
+    });
   });
 });
 
